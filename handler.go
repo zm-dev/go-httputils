@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"encoding/json"
 	"go.uber.org/zap"
+	"io"
 )
 
 var Logger *zap.Logger
@@ -41,7 +42,11 @@ func WarpFunc(f AppHandleFunc) http.Handler {
 }
 
 // todo: 不优雅
-var errorTpl = template.Must(template.ParseFiles("template/error.html"))
+var errorTpl *template.Template
+
+func SetErrorTpl(tpl string) {
+	errorTpl = template.Must(template.ParseFiles("template/error.html"))
+}
 
 func DefaultErrorHandleFunc(w http.ResponseWriter, r *http.Request, err HTTPError) {
 	// expectsJson := ExpectsJson(r)
@@ -71,11 +76,14 @@ func DefaultErrorHandleFunc(w http.ResponseWriter, r *http.Request, err HTTPErro
 			w.Write([]byte(err.Error()))
 		}
 		w.Write(b)
-	} else {
+	} else if errorTpl != nil {
 		w.Header().Add("Content-Type", "text/html")
 		w.WriteHeader(err.StatusCode())
 		if err := errorTpl.Execute(w, err); err != nil {
 			Logger.Warn("errorTpl.Execute(w, err) 执行失败!", zap.Error(err))
 		}
+	} else {
+		w.WriteHeader(err.StatusCode())
+		io.WriteString(w, err.Error())
 	}
 }
