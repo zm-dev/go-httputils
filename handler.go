@@ -68,7 +68,7 @@ func DefaultErrorHandleFunc(w http.ResponseWriter, r *http.Request, err HTTPErro
 
 	// todo 这里不优雅
 	if ExpectsJson(r) {
-		w.Header().Add("Content-Type", "application.pb/json")
+		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(err.StatusCode())
 		b, err := json.Marshal(err)
 		if err != nil {

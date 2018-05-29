@@ -105,7 +105,7 @@ func (e *APPError) StatusCode() int {
 
 func (e *APPError) Headers() http.Header {
 	//h := http.Header{}
-	//h.Add("Content-Type", "application.pb/json")
+	//h.Add("Content-Type", "application/json")
 	return e.headers
 }
 
